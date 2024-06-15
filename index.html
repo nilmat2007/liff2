@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE LIFF Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>LINE LIFF Example</h1>
+        <p id="userId"></p>
+        <div class="form-group">
+            <label for="altText">altText:</label>
+            <input type="text" class="form-control" id="altText" placeholder="Enter altText">
+        </div>
+        <div class="form-group">
+            <label for="flexJson">Flex JSON:</label>
+            <textarea class="form-control" id="flexJson" rows="5"></textarea>
+        </div>
+        <button id="shareTargetPicker" class="btn btn-primary" onclick="shareTargetPicker()">Share Flex Message</button>
+    </div>
+
+    <script>
+        // Initialize LIFF
+        function initializeLiff(myLiffId) {
+            liff.init({
+                liffId: myLiffId
+            })
+            .then(() => {
+                initializeApp();
+            })
+            .catch((err) => {
+                console.log('LIFF Initialization failed ', err);
+            });
+        }
+
+        // Initialize the app by calling functions handling individual app components
+        function initializeApp() {
+            displayLiffData();
+            getIsInClient();
+        }
+
+        function displayLiffData() {
+            const idToken = liff.getIDToken();
+            document.getElementById("userId").textContent = "User ID: " + idToken;
+        }
+
+        function getIsInClient() {
+            liff.isInClient()
+            .then(function(isInClientBool){
+                console.log("isInClient: " + isInClientBool);
+            })
+        }
+
+        function shareTargetPicker() {
+            const altText = document.getElementById("altText").value;
+            const flexJson = document.getElementById("flexJson").value;
+            try {
+                const contents = JSON.parse(flexJson);
+                liff.shareTargetPicker([{
+                    'type': 'flex',
+                    'altText': altText,
+                    'contents': contents
+                }])
+                .then(function() {
+                    liff.closeWindow();
+                })
+                .catch(function(res) {
+                    alert("Failed to send message: " + res);
+                });
+            } catch (e) {
+                alert("Invalid Flex JSON: " + e);
+            }
+        }
+
+        initializeLiff('2005615503-Km9AvR3a');
+    </script>
+</body>
+</html>
