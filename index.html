@@ -6,6 +6,15 @@
     <title>LINE LIFF Example</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        #flexPreview {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            height: 500px;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,9 +25,13 @@
         </div>
         <div class="form-group">
             <label for="flexJson">Flex JSON:</label>
-            <textarea class="form-control" id="flexJson" rows="5"></textarea>
+            <textarea class="form-control" id="flexJson" rows="5" placeholder="Enter Flex JSON"></textarea>
         </div>
         <button id="shareTargetPicker" class="btn btn-primary" onclick="shareTargetPicker()">Share Flex Message</button>
+        
+        <!-- Flex Message Preview -->
+        <h2>Flex Message Preview</h2>
+        <div id="flexPreview"></div>
     </div>
 
     <script>
@@ -58,6 +71,19 @@
             const flexJson = document.getElementById("flexJson").value;
             try {
                 const contents = JSON.parse(flexJson);
+                
+                // Update Flex Message preview
+                const flexPreview = document.getElementById("flexPreview");
+                flexPreview.innerHTML = '';
+                
+                liff.createFlexMessage(flexPreview, contents)
+                    .then((view) => {
+                        flexPreview.appendChild(view);
+                    })
+                    .catch((err) => {
+                        console.log('Error displaying Flex Message: ', err);
+                    });
+
                 liff.shareTargetPicker([{
                     'type': 'flex',
                     'altText': altText,
